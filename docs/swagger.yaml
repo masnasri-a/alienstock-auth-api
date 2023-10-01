@@ -18,6 +18,26 @@ definitions:
 info:
   contact: {}
 paths:
+  /getProfile:
+    get:
+      consumes:
+      - application/json
+      description: login endpoint
+      parameters:
+      - description: data search by fullname
+        in: query
+        name: fullname
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: ping example
+      tags:
+      - Profile
   /login:
     post:
       consumes:
@@ -39,7 +59,7 @@ paths:
             type: string
       summary: ping example
       tags:
-      - example
+      - Auth
   /register:
     post:
       consumes:
@@ -61,5 +81,5 @@ paths:
             type: string
       summary: ping example
       tags:
-      - example
+      - Auth
 swagger: "2.0"

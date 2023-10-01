@@ -15,6 +15,37 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/getProfile": {
+            "get": {
+                "description": "login endpoint",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "ping example",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "data search by fullname",
+                        "name": "fullname",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "description": "login endpoint",
@@ -25,7 +56,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "example"
+                    "Auth"
                 ],
                 "summary": "ping example",
                 "parameters": [
@@ -59,7 +90,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "example"
+                    "Auth"
                 ],
                 "summary": "ping example",
                 "parameters": [

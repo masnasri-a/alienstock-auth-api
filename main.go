@@ -30,5 +30,6 @@ func main() {
 	basePath := "/api/v1"
 	apiV1 := route.Group(basePath)
 	controller.AuthRouter(apiV1)
+	controller.ProfileRouter(apiV1)
 	route.Run()
 }

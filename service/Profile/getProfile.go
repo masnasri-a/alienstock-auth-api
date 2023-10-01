@@ -1,9 +1,8 @@
-package auth
+package profile
 
 import (
 	"alienstock-auth-api/config"
 	"alienstock-auth-api/models"
-	"alienstock-auth-api/util"
 	"context"
 	"fmt"
 	"net/http"
@@ -22,33 +21,28 @@ type UserResponse struct {
 // @Summary ping example
 // @Schemes
 // @Description login endpoint
-// @Tags Auth
+// @Tags Profile
 // @Accept json
 // @Produce json
-// @Param parameter body models.LoginModel true "PARAM"
-// @Success 200 {string} Login
-// @Router /login [post]
-func Login(ctx *gin.Context) {
-	var user models.LoginModel
+// @Param        fullname    query     string  false  "data search by fullname"
+// @Success 200 {string} GetProfile
+// @Router /getProfile [get]
+func GetSelfProfile(ctx *gin.Context) {
+	fmt.Println(ctx)
+	fullname := ctx.Query("fullname")
+	fmt.Printf("Fullname : %s\n", fullname)
+	var user models.UserModel
 	var responseFind models.ResponseUserModel
-	// jsonData, err := io.ReadAll(ctx.Request.Body)
-	if err := ctx.ShouldBindJSON(&user); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	hashedPassword := util.HashString(user.Password)
-	user.Password = hashedPassword
-	// Simpan pengguna yang didaftarkan
 	client, err := config.MongoConfig()
 	if err != nil {
 		// Handle kesalahan konfigurasi MongoDB
-		ctx.JSON(http.StatusInternalServerError, UserResponse{Message: "Cant connect database"})
+		// panic(err)
+		ctx.JSON(http.StatusInternalServerError, UserResponse{Message: "Databases failed"})
 		return
 	}
 	defer client.Disconnect(context.Background())
 	collection := client.Database("AlienStock").Collection("User")
-	filter := bson.D{{Key: "email", Value: user.Email}, {Key: "password", Value: user.Password}}
+	filter := bson.D{{Key: "fullname", Value: user.FullName}}
 	err = collection.FindOne(context.Background(), filter).Decode(&responseFind)
 
 	if err != nil {
@@ -56,13 +50,12 @@ func Login(ctx *gin.Context) {
 			// This error means your query did not match any documents.
 			ctx.JSON(http.StatusUnauthorized, UserResponse{Message: "Authentication failed"})
 			return
+		} else {
+			ctx.JSON(http.StatusInternalServerError, UserResponse{Message: "Databases failed"})
+			return
 		}
-		ctx.JSON(http.StatusInternalServerError, UserResponse{Message: "Database connection has broken"})
-		return
 	}
-
-	fmt.Printf("Username : %s\n", responseFind.FullName)
-	// Kirim respons
-	ctx.JSON(http.StatusCreated, UserResponse{Message: "User logged in successfully"})
+	ctx.JSON(http.StatusCreated, responseFind)
 	return
+
 }
